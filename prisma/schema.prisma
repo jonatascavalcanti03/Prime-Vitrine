@@ -209,3 +209,39 @@ model AccessLog {
   @@index([userId])
   @@map("access_logs")
 }
+
+// ─────────────────────────────────────────────
+// GENERATED SITE – Fábrica de Sites Express (Google Maps -> Landing Page IA)
+// ─────────────────────────────────────────────
+model GeneratedSite {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  businessName     String
+  category         String
+  phone            String?
+  whatsapp         String?
+  address          String?
+  city             String?
+  mapsUrl          String?  @db.Text
+  rating           Float?   @default(5.0)
+  reviewsCount     Int?     @default(48)
+  heroTitle        String
+  heroSubtitle     String   @db.Text
+  aboutText        String   @db.Text
+  servicesJson     String   @db.Text
+  benefitsJson     String   @db.Text
+  testimonialsJson String   @db.Text
+  faqJson          String   @db.Text
+  themePalette     String   @default("emerald")
+  heroImageUrl     String?  @db.Text
+  galleryJson      String?  @db.Text
+  status           String   @default("PUBLISHED")
+  viewsCount       Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([slug])
+  @@index([category])
+  @@index([status])
+  @@map("generated_sites")
+}
