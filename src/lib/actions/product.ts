@@ -43,6 +43,8 @@ export async function analyzeMercadoLivreProduct(url: string) {
         aiSummary: aiResult.summary,
         aiPros: aiResult.pros,
         aiCons: aiResult.cons,
+        optimizedMlTitle: aiResult.optimizedMlTitle,
+        plainDescription: aiResult.plainDescription,
       },
     };
   } catch (error) {

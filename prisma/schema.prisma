@@ -154,6 +154,7 @@ model Product {
   mediaUrls       Json          @default("[]") // [{ url: string, type: 'image' }]
 
   // Visibilidade & Destaque
+  stock           Int           @default(10)
   status          ProductStatus @default(AVAILABLE)
   featured        Boolean       @default(false)
   views           Int           @default(0)
