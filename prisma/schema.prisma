@@ -31,12 +31,30 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  accessLogs    AccessLog[]
+  accounts             Account[]
+  sessions             Session[]
+  accessLogs           AccessLog[]
+  mercadoLivreAccounts MercadoLivreAccount[]
 
   @@index([email])
   @@map("users")
+}
+
+model MercadoLivreAccount {
+  id           String   @id @default(cuid())
+  userId       String
+  mlUserId     String   @unique
+  nickname     String?
+  accessToken  String   @db.Text
+  refreshToken String   @db.Text
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("mercado_livre_accounts")
 }
 
 model Account {
@@ -116,6 +134,17 @@ model Product {
   price           Decimal       @db.Decimal(10, 2)
   originalPrice   Decimal?      @db.Decimal(10, 2)
   discountPercent Int?
+
+  // Precificação Dropshipping / Automação ML
+  costPrice        Float?
+  profitMargin     Float?
+  mlFeePercent     Float?
+  mlItemId         String?
+  mlPermalink      String?       @db.Text
+  plainDescription String?       @db.Text
+  listingType      String        @default("gold_special")
+  mlCategoryId     String?
+  syncStatus       String        @default("DRAFT")
 
   // URLs de Afiliado (Mercado Livre)
   originalUrl     String        @db.Text // URL direta do anúncio
