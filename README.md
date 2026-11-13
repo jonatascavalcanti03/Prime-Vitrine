@@ -73,6 +73,4 @@ npx tsx prisma/seed-admin.ts
 npm run dev
 ```
 
-Acesse:
-- **Site:** `http://localhost:3000`
-- **Painel Admin:** `http://localhost:3000/dashboard` (admin@luxe.com / admin123)
+
