@@ -25,7 +25,7 @@ const DEMO_SLIDES: HeroSlide[] = [
     subtitle: "Câmera de 48 MP, Dynamic Island e conexão USB-C com envio rápido.",
     brand: "APPLE",
     price: 4799,
-    imageUrl: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=900&auto=format",
+    imageUrl: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=900&auto=format",
     href: "/p/apple-iphone-15-128gb-preto",
     accentColor: "#10b981",
   },
