@@ -21,7 +21,7 @@ async function main() {
       originalUrl: "https://www.mercadolivre.com.br/apple-iphone-15-128-gb-preto/p/MLB28000000",
       affiliateUrl: "https://www.mercadolivre.com.br/apple-iphone-15-128-gb-preto/p/MLB28000000",
       mediaUrls: [
-        { url: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=800&auto=format", type: "image" }
+        { url: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=800&auto=format", type: "image" }
       ],
       aiSummary: "O iPhone 15 redefine a fotografia mobile com câmera de 48 MP e Dynamic Island. Excelente autonomia de bateria e construção em alumínio aeroespacial com vidro resistente.",
       aiPros: ["Câmera de 48 MP com alta definição", "Entrada USB-C universal", "Tela Super Retina XDR com Dynamic Island"],

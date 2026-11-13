@@ -81,14 +81,14 @@ export default async function HomePage() {
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-4 h-4 text-emerald-400" />
               <span className="text-xs font-semibold tracking-[0.2em] uppercase text-emerald-400">
-                Curadoria Exclusiva
+                Seleção Prime
               </span>
             </div>
             <h2 className="heading-luxury text-3xl sm:text-4xl">
-              Peças em Destaque
+              Ofertas em Destaque
             </h2>
             <p className="text-white/40 text-sm mt-2 max-w-md">
-              Selecionadas a dedo. Cada peça conta uma história de estilo e sofisticação.
+              Produtos selecionados com os melhores preços e descontos do Mercado Livre.
             </p>
           </div>
           <Link

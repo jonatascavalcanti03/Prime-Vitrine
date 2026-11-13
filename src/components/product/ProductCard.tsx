@@ -5,11 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import {
-  Heart,
   Eye,
   Flame,
   ShoppingBag,
-  Share2,
   MessageCircle,
   Star,
   Zap,
@@ -79,11 +77,16 @@ function StatusBadge({ status }: { status: ProductStatus }) {
 // WhatsApp Compartilhar Oferta URL
 // ─────────────────────────────────────────────
 function buildWhatsAppUrl(product: ProductCardProps) {
+  const siteUrl =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "https://primevitrine.com.br";
   const msg = encodeURIComponent(
-    `Olhe esta oferta que encontrei:\n\n` +
+    `🔥 Achei essa oferta incrível!\n\n` +
     `*${product.title}*\n` +
-    `Preço: ${formatBRL(product.price)}\n\n` +
-    `🔗 https://seusite.com/p/${product.slug}`
+    `💰 Por apenas ${formatBRL(product.price)}` +
+    (product.originalPrice ? ` ~~${formatBRL(product.originalPrice)}~~` : "") +
+    `\n\n👉 ${siteUrl}/p/${product.slug}`
   );
   return `https://wa.me/?text=${msg}`;
 }
@@ -94,11 +97,10 @@ function buildWhatsAppUrl(product: ProductCardProps) {
 export function ProductCard(props: ProductCardProps) {
   const {
     id, slug, title, brand, category, categoryName, price, originalPrice,
-    imageUrl, hasVideo, status, views, clicksCount, isFavorited = false,
-    featured = false, onToggleFavorite,
+    imageUrl, hasVideo, status, views, clicksCount,
+    featured = false,
   } = props;
 
-  const [favorited, setFavorited]     = useState(isFavorited);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -178,7 +180,7 @@ export function ProductCard(props: ProductCardProps) {
         >
           <Image
             src={imageUrl}
-            alt={`${title} – ${brand ?? "Brechó de Luxo"}`}
+            alt={`${title} – ${brand ?? "Prime Vitrine"}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className={clsx(
@@ -232,31 +234,20 @@ export function ProductCard(props: ProductCardProps) {
             )}
           </div>
 
-          {/* Favorite button */}
-          <motion.button
-            id={`favorite-${id}`}
-            aria-label={favorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
-            onClick={(e) => {
-              e.preventDefault();
-              setFavorited(!favorited);
-              onToggleFavorite?.(id);
-            }}
-            className={clsx(
-              "flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200",
-              favorited
-                ? "bg-red-500/20 border border-red-500/30"
-                : "bg-black/30 border border-white/10 hover:bg-red-500/10 hover:border-red-500/20"
-            )}
+          {/* WhatsApp Share button */}
+          <motion.a
+            id={`whatsapp-${id}`}
+            href={buildWhatsAppUrl(props)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Compartilhar oferta no WhatsApp"
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 bg-black/30 border border-white/10 hover:bg-green-500/20 hover:border-green-500/30"
             whileHover={{ scale: 1.15 }}
             whileTap={{ scale: 0.85 }}
           >
-            <Heart
-              className={clsx(
-                "w-4 h-4 transition-all duration-200",
-                favorited ? "fill-red-400 text-red-400" : "text-white/60"
-              )}
-            />
-          </motion.button>
+            <MessageCircle className="w-4 h-4 text-white/60 group-hover:text-green-400 transition-colors" />
+          </motion.a>
         </div>
 
         {/* ── Urgency Badge (bottom of image) ── */}
@@ -361,18 +352,18 @@ export function ProductCard(props: ProductCardProps) {
                 <ShoppingBag className="w-3.5 h-3.5" />
                 Ver Oferta
               </a>
-              <motion.button
+              <motion.a
                 id={`share-${id}`}
-                aria-label="Compartilhar produto"
-                className="btn-ghost !py-2.5 !px-3"
+                href={buildWhatsAppUrl(props)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Compartilhar no WhatsApp"
+                className="btn-ghost !py-2.5 !px-3 flex items-center justify-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() =>
-                  navigator.share?.({ title, url: `/p/${slug}` })
-                }
               >
-                <Share2 className="w-3.5 h-3.5" />
-              </motion.button>
+                <MessageCircle className="w-3.5 h-3.5 text-green-400" />
+              </motion.a>
             </>
           ) : (
             <button
