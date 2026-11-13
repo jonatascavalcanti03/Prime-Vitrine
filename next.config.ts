@@ -19,6 +19,17 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      // Mercado Livre (mlstatic)
+      {
+        protocol: "https",
+        hostname: "**.mlstatic.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "http",
+        hostname: "**.mlstatic.com",
+        pathname: "/**",
+      },
     ],
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
