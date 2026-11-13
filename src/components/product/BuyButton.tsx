@@ -1,87 +1,48 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { ShoppingBag, Loader2 } from "lucide-react";
+import { ExternalLink, ShoppingBag } from "lucide-react";
 
 interface BuyButtonProps {
   productId: string;
   productSlug: string;
-  userId?: string;
   className?: string;
   disabled?: boolean;
 }
 
-// ─────────────────────────────────────────────────────────
-// BuyButton — Inicia o fluxo de checkout Stripe
-// Reserva a peça + redireciona para a Checkout Session
-// ─────────────────────────────────────────────────────────
+/**
+ * BuyButton — Botão de Redirecionamento de Afiliado (Mercado Livre)
+ * Direciona o visitante para a rota /r/[slug], registrando a métrica e
+ * enviando-o com o tracking tag de afiliado para o Mercado Livre.
+ */
 export function BuyButton({
   productId,
-  userId,
+  productSlug,
   className = "",
   disabled = false,
 }: BuyButtonProps) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleBuy = async () => {
-    if (loading || disabled) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, userId }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error ?? "Erro ao iniciar o checkout");
-        setLoading(false);
-        return;
-      }
-
-      // Redirecionar para o Stripe Checkout
-      if (data.url) {
-        router.push(data.url);
-      }
-    } catch {
-      setError("Erro de conexão. Tente novamente.");
-      setLoading(false);
-    }
-  };
+  if (disabled) {
+    return (
+      <button
+        disabled
+        className={`w-full py-3.5 px-6 rounded-xl font-medium text-sm text-white/30 bg-white/5 border border-white/5 cursor-not-allowed ${className}`}
+      >
+        Oferta Indisponível
+      </button>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-2">
-      <button
-        id={`buy-button-${productId}`}
-        onClick={handleBuy}
-        disabled={loading || disabled}
-        className={`btn-primary ${className} ${loading || disabled ? "opacity-60 cursor-not-allowed" : ""}`}
-        aria-label="Comprar esta peça"
-      >
-        {loading ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Processando...
-          </>
-        ) : (
-          <>
-            <ShoppingBag className="w-4 h-4" />
-            Comprar Agora
-          </>
-        )}
-      </button>
-
-      {error && (
-        <p className="text-xs text-red-400 text-center">{error}</p>
-      )}
-    </div>
+    <a
+      id={`buy-button-${productId}`}
+      href={`/r/${productSlug}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`btn-primary flex items-center justify-center gap-2 !py-4 !text-base font-semibold shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-[0.98] transition-all group ${className}`}
+      aria-label="Ver oferta no Mercado Livre"
+    >
+      <ShoppingBag className="w-5 h-5 text-emerald-300 group-hover:scale-110 transition-transform" />
+      <span>Ver Oferta no Mercado Livre</span>
+      <ExternalLink className="w-4 h-4 text-white/60 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+    </a>
   );
 }

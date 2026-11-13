@@ -5,10 +5,10 @@ import { SlidersHorizontal, Search } from "lucide-react";
 export const revalidate = 60; // Revalida a página a cada 60s (ISR)
 
 export default async function VitrinePage() {
-  // Busca produtos no banco de dados (Apenas AVAILABLE ou RESERVED)
+  // Busca produtos no banco de dados (Apenas ofertas ativas)
   const products = await prisma.product.findMany({
     where: {
-      status: { in: ["AVAILABLE", "RESERVED"] },
+      status: "AVAILABLE",
     },
     orderBy: { createdAt: "desc" },
   });
@@ -20,10 +20,10 @@ export default async function VitrinePage() {
         {/* ── Header da Vitrine ── */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <h1 className="heading-luxury text-4xl sm:text-5xl mb-4">A Vitrine</h1>
+            <h1 className="heading-luxury text-4xl sm:text-5xl mb-4">Prime Vitrine</h1>
             <p className="text-white/50 text-sm max-w-lg leading-relaxed">
-              Explore nossa curadoria de peças exclusivas. Cada item é único, autenticado
-              e selecionado para elevar sua jornada de estilo.
+              Explore nossa seleção com as melhores ofertas e produtos em alta do Mercado Livre,
+              com descontos reais, análise por IA e garantia de entrega oficial.
             </p>
           </div>
           
@@ -32,7 +32,7 @@ export default async function VitrinePage() {
             <div className="relative flex-1 md:w-64">
               <input 
                 type="text" 
-                placeholder="Buscar peças..." 
+                placeholder="Buscar ofertas..." 
                 className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-white/30 focus:outline-none focus:border-emerald/50 focus:ring-1 focus:ring-emerald/50 transition-all"
               />
               <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -71,15 +71,14 @@ export default async function VitrinePage() {
                   slug={product.slug}
                   title={product.title}
                   brand={product.brand || undefined}
-                  category={product.category}
-                  size={product.size || undefined}
-                  condition={product.condition}
+                  categoryName={product.categoryName}
                   price={Number(product.price)}
                   originalPrice={product.originalPrice ? Number(product.originalPrice) : undefined}
+                  discountPercent={product.discountPercent || undefined}
                   imageUrl={imageUrl}
                   status={product.status}
                   views={product.views}
-                  interested={product.interested}
+                  clicksCount={product.clicksCount}
                   featured={product.featured}
                 />
               );

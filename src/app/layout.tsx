@@ -6,32 +6,33 @@ import { CustomCursor } from "@/components/ui/CustomCursor";
 
 export const metadata: Metadata = {
   title: {
-    default: "Brechó de Luxo | Peças Únicas & Exclusivas",
-    template: "%s | Brechó de Luxo",
+    default: "Prime Vitrine | Melhores Ofertas do Mercado Livre",
+    template: "%s | Prime Vitrine",
   },
   description:
-    "Curadoria exclusiva de peças de moda de luxo, vintage e seminovas. Cada peça é única, tratada como obra de arte. Encontre sua próxima joia fashion aqui.",
+    "Curadoria inteligente das melhores ofertas, eletrônicos, tecnologia e produtos em alta do Mercado Livre com análise por IA e compra 100% segura.",
   keywords: [
-    "brechó de luxo",
-    "moda vintage",
-    "peças exclusivas",
-    "segunda mão luxo",
-    "moda sustentável",
-    "designer vintage",
-    "brechó online",
+    "prime vitrine",
+    "ofertas mercado livre",
+    "promoções",
+    "curadoria de ofertas",
+    "melhores descontos",
+    "afiliados mercado livre",
+    "tecnologia",
+    "eletrônicos",
   ],
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    title: "Brechó de Luxo | Peças Únicas & Exclusivas",
+    title: "Prime Vitrine | Melhores Ofertas do Mercado Livre",
     description:
-      "Curadoria exclusiva de peças de moda de luxo, vintage e seminovas. Cada peça é única.",
-    siteName: "Brechó de Luxo",
+      "Curadoria inteligente das melhores ofertas, eletrônicos e tecnologia com análise por IA.",
+    siteName: "Prime Vitrine",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Brechó de Luxo | Peças Únicas & Exclusivas",
-    description: "Curadoria exclusiva de peças de moda de luxo.",
+    title: "Prime Vitrine | Melhores Ofertas do Mercado Livre",
+    description: "Curadoria inteligente das melhores ofertas do Mercado Livre.",
   },
   robots: {
     index: true,

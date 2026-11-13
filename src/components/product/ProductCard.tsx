@@ -19,44 +19,27 @@ import { clsx } from "clsx";
 // ─────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────
-export type ProductStatus = "AVAILABLE" | "RESERVED" | "SOLD";
-export type Condition =
-  | "NOVO_COM_ETIQUETA"
-  | "SEMINOVO"
-  | "OTIMO_ESTADO"
-  | "BOM_ESTADO"
-  | "VINTAGE";
+export type ProductStatus = "AVAILABLE" | "PAUSED" | "EXPIRED";
 
 export interface ProductCardProps {
   id: string;
   slug: string;
   title: string;
   brand?: string;
-  category: string;
-  size?: string;
-  condition: Condition;
+  category?: string;
+  categoryName?: string;
   price: number;
   originalPrice?: number;
+  discountPercent?: number;
   imageUrl: string;
   hasVideo?: boolean;
   status: ProductStatus;
   views?: number;
-  interested?: number;
+  clicksCount?: number;
   isFavorited?: boolean;
   featured?: boolean;
   onToggleFavorite?: (id: string) => void;
 }
-
-// ─────────────────────────────────────────────
-// Condition Labels
-// ─────────────────────────────────────────────
-const CONDITION_LABELS: Record<Condition, string> = {
-  NOVO_COM_ETIQUETA: "10/10 • Com Etiqueta",
-  SEMINOVO:          "9/10 • Seminovo",
-  OTIMO_ESTADO:      "8/10 • Ótimo Estado",
-  BOM_ESTADO:        "7/10 • Bom Estado",
-  VINTAGE:           "Vintage Autêntico",
-};
 
 // ─────────────────────────────────────────────
 // Format currency (BRL)
@@ -68,43 +51,41 @@ const formatBRL = (value: number) =>
 // Status Badge
 // ─────────────────────────────────────────────
 function StatusBadge({ status }: { status: ProductStatus }) {
-  if (status === "SOLD") {
+  if (status === "EXPIRED") {
     return (
       <span className="badge-sold">
         <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
-        Vendido
+        Encerrada
       </span>
     );
   }
-  if (status === "RESERVED") {
+  if (status === "PAUSED") {
     return (
       <span className="badge-reserved">
         <span className="w-1.5 h-1.5 rounded-full bg-yellow-400" />
-        Reservado
+        Pausada
       </span>
     );
   }
   return (
     <span className="badge-available">
       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-      Disponível
+      Oferta Ativa
     </span>
   );
 }
 
 // ─────────────────────────────────────────────
-// WhatsApp Venda Assistida URL
+// WhatsApp Compartilhar Oferta URL
 // ─────────────────────────────────────────────
 function buildWhatsAppUrl(product: ProductCardProps) {
   const msg = encodeURIComponent(
-    `Olá! Tenho interesse na peça:\n\n` +
+    `Olhe esta oferta que encontrei:\n\n` +
     `*${product.title}*\n` +
-    `Marca: ${product.brand ?? "–"} | Tamanho: ${product.size ?? "–"}\n` +
-    `Estado: ${CONDITION_LABELS[product.condition]}\n` +
     `Preço: ${formatBRL(product.price)}\n\n` +
     `🔗 https://seusite.com/p/${product.slug}`
   );
-  return `https://wa.me/5500000000000?text=${msg}`;
+  return `https://wa.me/?text=${msg}`;
 }
 
 // ─────────────────────────────────────────────
@@ -112,8 +93,8 @@ function buildWhatsAppUrl(product: ProductCardProps) {
 // ─────────────────────────────────────────────
 export function ProductCard(props: ProductCardProps) {
   const {
-    id, slug, title, brand, size, condition, price, originalPrice,
-    imageUrl, hasVideo, status, views, interested, isFavorited = false,
+    id, slug, title, brand, category, categoryName, price, originalPrice,
+    imageUrl, hasVideo, status, views, clicksCount, isFavorited = false,
     featured = false, onToggleFavorite,
   } = props;
 
@@ -279,7 +260,7 @@ export function ProductCard(props: ProductCardProps) {
         </div>
 
         {/* ── Urgency Badge (bottom of image) ── */}
-        {isAvailable && interested && interested > 2 && (
+        {isAvailable && clicksCount && clicksCount > 5 && (
           <motion.div
             className="absolute bottom-3 left-3 z-10"
             initial={{ opacity: 0, x: -10 }}
@@ -288,7 +269,7 @@ export function ProductCard(props: ProductCardProps) {
           >
             <span className="badge-urgency flex items-center gap-1.5">
               <Flame className="w-3 h-3 fill-red-400 text-red-400" />
-              <span>{interested} pessoas interessadas</span>
+              <span>{clicksCount} pessoas viram</span>
             </span>
           </motion.div>
         )}
@@ -313,19 +294,11 @@ export function ProductCard(props: ProductCardProps) {
 
       {/* ── Card Body ── */}
       <div className="p-4 flex flex-col gap-3">
-        {/* Brand & Size */}
+        {/* Brand */}
         <div className="flex items-center justify-between">
           {brand && (
             <span className="text-xs font-semibold tracking-widest uppercase text-gradient-gold">
               {brand}
-            </span>
-          )}
-          {size && (
-            <span
-              className="text-xs px-2 py-0.5 rounded-md font-medium text-white/50"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.06)" }}
-            >
-              {size}
             </span>
           )}
         </div>
@@ -339,8 +312,8 @@ export function ProductCard(props: ProductCardProps) {
           {title}
         </Link>
 
-        {/* Condition */}
-        <span className="text-xs text-white/40">{CONDITION_LABELS[condition]}</span>
+        {/* Categoria */}
+        <span className="text-xs text-emerald-400/80">{categoryName || category || "Oferta Selecionada"}</span>
 
         {/* Price Row */}
         <div className="flex items-end justify-between gap-2 mt-1">
@@ -372,22 +345,21 @@ export function ProductCard(props: ProductCardProps) {
             <>
               <Link
                 href={`/p/${slug}`}
-                id={`buy-${id}`}
-                className="btn-primary flex-1 !py-2.5 !text-xs"
+                id={`details-${id}`}
+                className="btn-ghost flex-1 !py-2.5 !text-xs text-center border border-white/10 hover:border-emerald-500/30"
               >
-                <ShoppingBag className="w-3.5 h-3.5" />
-                Comprar
+                Ver Detalhes
               </Link>
               <a
-                href={buildWhatsAppUrl(props)}
-                id={`whatsapp-${id}`}
+                href={`/r/${slug}`}
+                id={`buy-${id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Contato via WhatsApp"
-                className="btn-gold !py-2.5 !px-3"
-                title="Venda Assistida via WhatsApp"
+                className="btn-primary flex-1 !py-2.5 !text-xs flex items-center justify-center gap-1.5"
+                title="Abrir oferta oficial no Mercado Livre"
               >
-                <MessageCircle className="w-3.5 h-3.5" />
+                <ShoppingBag className="w-3.5 h-3.5" />
+                Ver Oferta
               </a>
               <motion.button
                 id={`share-${id}`}
@@ -408,19 +380,19 @@ export function ProductCard(props: ProductCardProps) {
               className="flex-1 py-2.5 rounded-xl text-xs font-medium text-white/30 border border-white/5 cursor-not-allowed"
               style={{ background: "rgba(255,255,255,0.02)" }}
             >
-              {status === "SOLD" ? "Peça Vendida" : "Reservada"}
+              Oferta Pausada
             </button>
           )}
         </div>
       </div>
 
-      {/* ── Sold overlay ── */}
-      {status === "SOLD" && (
+      {/* ── Expired overlay ── */}
+      {status === "EXPIRED" && (
         <div className="absolute inset-0 rounded-2xl flex items-center justify-center z-20"
           style={{ background: "rgba(5,5,5,0.7)", backdropFilter: "blur(2px)" }}>
           <div className="text-center">
-            <p className="font-serif text-2xl font-bold text-white/80">VENDIDO</p>
-            <p className="text-xs text-white/40 mt-1">Esta peça encontrou um novo lar ✨</p>
+            <p className="font-serif text-2xl font-bold text-white/80">ENCERRADA</p>
+            <p className="text-xs text-white/40 mt-1">Esta oferta foi encerrada ✨</p>
           </div>
         </div>
       )}

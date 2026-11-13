@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Lock, Mail, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -35,7 +35,7 @@ export default function LoginPage() {
         router.push(callbackUrl);
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError("Ocorreu um erro ao entrar. Tente mais tarde.");
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-[#050505] relative overflow-hidden">
       {/* Ambient Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 blur-[120px] rounded-full -z-10" />
-      <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-rose-gold/5 blur-[100px] rounded-full -z-10" />
+      <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-emerald-500/5 blur-[100px] rounded-full -z-10" />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -57,65 +57,63 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-10">
           <Link href="/" className="inline-flex items-center gap-2.5 mb-6 group">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald to-rose-gold flex items-center justify-center shadow-lg shadow-emerald/20 group-hover:rotate-12 transition-transform">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald to-emerald-400 flex items-center justify-center shadow-lg shadow-emerald/20 group-hover:rotate-12 transition-transform">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
+            <span className="font-serif font-bold text-2xl tracking-tight text-white block">
+              Prime <span className="text-gradient-gold">Vitrine</span>
+            </span>
           </Link>
-          <h1 className="heading-luxury text-3xl mb-2">Acesso Restrito</h1>
-          <p className="text-sm text-white/40">Entre com suas credenciais de administrador Luxé.</p>
+          <h1 className="text-2xl font-serif text-white mb-2">Acesso Administrativo</h1>
+          <p className="text-sm text-white/40">Entre para gerenciar seu catálogo e links de afiliados.</p>
         </div>
 
-        {/* Login Form */}
-        <div className="glass-card p-8 border border-white/5 shadow-2xl">
+        {/* Card */}
+        <div className="glass-card p-8 border border-white/10 shadow-2xl relative">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-400 text-xs"
-              >
-                <AlertCircle className="w-4 h-4" />
-                {error}
-              </motion.div>
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-3 text-red-400 text-xs">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>{error}</span>
+              </div>
             )}
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 ml-1">Email</label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-white/20 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input 
-                    type="email" 
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="exemplo@luxe.com" 
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2 ml-1">
-                  <label className="block text-[10px] font-bold uppercase tracking-widest text-white/40">Senha</label>
-                  <button type="button" className="text-[10px] text-white/20 hover:text-white transition-colors">Esqueceu?</button>
-                </div>
-                <div className="relative">
-                  <Lock className="w-4 h-4 text-white/20 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input 
-                    type="password" 
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••" 
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-12 py-4 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald-500/50 transition-all shadow-inner"
-                  />
-                </div>
+            <div>
+              <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
+                E-mail
+              </label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@luxe.com"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald/50 focus:ring-1 focus:ring-emerald/50 transition-all"
+                />
+                <Mail className="w-4 h-4 text-white/40 absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
             </div>
 
-            <button 
-              type="submit" 
+            <div>
+              <label className="block text-xs font-semibold text-white/40 uppercase tracking-widest mb-2">
+                Senha
+              </label>
+              <div className="relative">
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-11 text-sm text-white placeholder-white/20 focus:outline-none focus:border-emerald/50 focus:ring-1 focus:ring-emerald/50 transition-all"
+                />
+                <Lock className="w-4 h-4 text-white/40 absolute left-4 top-1/2 -translate-y-1/2" />
+              </div>
+            </div>
+
+            <button
+              type="submit"
               disabled={loading}
               className="w-full btn-primary !py-4 flex items-center justify-center gap-3 shadow-lg shadow-emerald/20 hover:shadow-emerald/40 disabled:opacity-50 disabled:hover:scale-100"
             >
@@ -133,9 +131,17 @@ export default function LoginPage() {
 
         {/* Footer info */}
         <p className="mt-8 text-center text-xs text-white/20">
-          Problemas com o acesso? <Link href="/" className="text-white/40 hover:text-emerald-400 transition-colors">Contate o suporte técnico.</Link>
+          Problemas com o acesso? <Link href="/" className="text-white/40 hover:text-emerald-400 transition-colors">Voltar ao site público.</Link>
         </p>
       </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#050505] flex items-center justify-center text-white/40 text-sm">Carregando painel...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

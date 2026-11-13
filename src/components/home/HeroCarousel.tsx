@@ -17,37 +17,37 @@ interface HeroSlide {
   accentColor?: string;
 }
 
-// Demo slides (substitua por dados reais do DB)
+// Slides de Destaque da Prime Vitrine
 const DEMO_SLIDES: HeroSlide[] = [
   {
     id: "1",
-    title: "Bolsa Chanel Classic Flap",
-    subtitle: "Peça icônica em couro caviar. Serial autenticado. 9/10.",
-    brand: "CHANEL",
-    price: 28900,
-    imageUrl: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=900&auto=format",
-    href: "/p/chanel-classic-flap",
-    accentColor: "#d4af37",
+    title: "Apple iPhone 15 (128 GB)",
+    subtitle: "Câmera de 48 MP, Dynamic Island e conexão USB-C com envio rápido.",
+    brand: "APPLE",
+    price: 4799,
+    imageUrl: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=900&auto=format",
+    href: "/p/apple-iphone-15-128gb-preto",
+    accentColor: "#10b981",
   },
   {
     id: "2",
-    title: "Vestido Valentino Couture",
-    subtitle: "Alta costura italiana. Bordado floral exclusivo. Novo com etiqueta.",
-    brand: "VALENTINO",
-    price: 15400,
-    imageUrl: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&auto=format",
-    href: "/p/valentino-couture-dress",
-    accentColor: "#e91e63",
+    title: "PlayStation 5 Slim Digital",
+    subtitle: "Jogos em até 4K 120 FPS, SSD de 1TB ultrarrápido e áudio 3D imersivo.",
+    brand: "SONY",
+    price: 3499,
+    imageUrl: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=900&auto=format",
+    href: "/p/sony-playstation-5-slim-digital",
+    accentColor: "#3b82f6",
   },
   {
     id: "3",
-    title: "Relógio Rolex Datejust 36",
-    subtitle: "Mostrador diamante. Pulseira Jubilee. Papers completos.",
-    brand: "ROLEX",
-    price: 72000,
-    imageUrl: "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=900&auto=format",
-    href: "/p/rolex-datejust-36",
-    accentColor: "#10b981",
+    title: "Smart TV 55\" 4K UHD Samsung",
+    subtitle: "Processador Crystal 4K, Gaming Hub e design slim sem bordas.",
+    brand: "SAMSUNG",
+    price: 2499,
+    imageUrl: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=900&auto=format",
+    href: "/p/smart-tv-55-4k-samsung-crystal",
+    accentColor: "#d4af37",
   },
 ];
 
@@ -151,7 +151,7 @@ export function HeroCarousel() {
             <div className="flex items-center gap-6 flex-wrap">
               <div>
                 <p className="text-xs text-white/40 uppercase tracking-widest mb-0.5">
-                  Preço único
+                  Menor Preço
                 </p>
                 <p className="text-3xl font-bold text-white">
                   {formatBRL(slide.price)}
@@ -160,7 +160,7 @@ export function HeroCarousel() {
 
               <div className="flex gap-3">
                 <Link href={slide.href} id={`hero-cta-${slide.id}`} className="btn-primary">
-                  Ver Peça
+                  Ver Oferta
                 </Link>
                 <Link href="/vitrine" id="hero-vitrine-cta" className="btn-ghost">
                   Ver Vitrine

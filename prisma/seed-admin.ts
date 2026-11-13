@@ -15,7 +15,7 @@ async function main() {
       email: "admin@luxe.com",
       name: "Admin Luxé",
       password: hashedPassword,
-      role: "SUPER_ADMIN",
+      role: "ADMIN",
     },
   });
 

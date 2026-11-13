@@ -11,13 +11,11 @@ declare module "next-auth" {
     user: {
       id: string;
       role: Role;
-      storeId?: string | null;
     } & DefaultSession["user"];
   }
 
   interface User {
     role: Role;
-    storeId?: string | null;
   }
 }
 
@@ -59,7 +57,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: user.name,
           image: user.image,
           role: user.role,
-          storeId: user.storeId,
         };
       },
     }),
@@ -69,7 +66,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = user.role;
-        token.storeId = user.storeId;
       }
       return token;
     },
@@ -77,7 +73,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as Role;
-        session.user.storeId = token.storeId as string | undefined;
       }
       return session;
     },

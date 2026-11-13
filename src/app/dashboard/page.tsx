@@ -2,67 +2,77 @@ import { prisma } from "@/lib/prisma";
 import { 
   TrendingUp, 
   Package, 
-  ShoppingBag, 
+  MousePointerClick, 
   ArrowUpRight,
-  ArrowDownRight,
-  Clock,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  Eye
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default async function DashboardPage() {
-  // 1. Buscar estatísticas reais do banco
-  const [totalProducts, totalSales, pendingOrders, soldProducts] = await Promise.all([
+  // 1. Buscar métricas de afiliados
+  const [totalProducts, totalClicks, topProducts, recentClicks] = await Promise.all([
     prisma.product.count(),
-    prisma.order.aggregate({ _sum: { totalPrice: true } }),
-    prisma.order.count({ where: { status: "PENDING" } }),
-    prisma.product.count({ where: { status: "SOLD" } }),
+    prisma.clickAnalytics.count(),
+    prisma.product.findMany({
+      take: 5,
+      orderBy: { clicksCount: "desc" },
+      where: { clicksCount: { gt: 0 } },
+    }),
+    prisma.clickAnalytics.findMany({
+      take: 5,
+      orderBy: { clickedAt: "desc" },
+      include: { product: { select: { title: true, slug: true, mediaUrls: true } } },
+    }),
   ]);
 
   const stats = [
     { 
-      label: "Receita Total", 
-      value: new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(totalSales._sum.totalPrice || 0)), 
-      icon: TrendingUp, 
-      trend: "+12.5%", 
+      label: "Cliques de Afiliados", 
+      value: totalClicks, 
+      icon: MousePointerClick, 
+      trend: "Total acumulado", 
       isPositive: true 
     },
     { 
-      label: "Peças em Estoque", 
-      value: totalProducts - soldProducts, 
+      label: "Ofertas Cadastradas", 
+      value: totalProducts, 
       icon: Package, 
-      trend: "Disponíveis", 
+      trend: "No catálogo", 
       isPositive: true 
     },
     { 
-      label: "Peças Vendidas", 
-      value: soldProducts, 
-      icon: ShoppingBag, 
-      trend: "Vitalício", 
+      label: "Top 1 Produto Mais Clicado", 
+      value: topProducts[0]?.clicksCount || 0, 
+      icon: TrendingUp, 
+      trend: topProducts[0]?.title ? topProducts[0].title.substring(0, 16) + "..." : "Sem cliques", 
       isPositive: true 
     },
     { 
-      label: "Pedidos Pendentes", 
-      value: pendingOrders, 
-      icon: Clock, 
-      trend: "Aguardando", 
-      isPositive: false 
+      label: "Taxa de Engajamento", 
+      value: totalProducts > 0 ? (totalClicks / totalProducts).toFixed(1) + " cl/prod" : "0", 
+      icon: Sparkles, 
+      trend: "Média por oferta", 
+      isPositive: true 
     },
   ];
-
-  // 2. Buscar últimas vendas
-  const recentOrders = await prisma.order.findMany({
-    take: 5,
-    orderBy: { createdAt: "desc" },
-    include: { product: { select: { title: true, mediaUrls: true } } }
-  });
 
   return (
     <div className="space-y-8">
       {/* ── Greeting ── */}
-      <div>
-        <h1 className="text-2xl font-serif text-white">Bem-vindo ao Painel Luxé</h1>
-        <p className="text-sm text-white/40 mt-1">Aqui está o que está acontecendo com sua boutique hoje.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-serif text-white">Painel Prime Vitrine (Mercado Livre)</h1>
+          <p className="text-sm text-white/40 mt-1">
+            Acompanhe o desempenho das suas ofertas curadas e conversões de cliques.
+          </p>
+        </div>
+        <Link href="/dashboard/inventory/new" className="btn-primary !py-2.5 !px-5 !text-xs flex items-center gap-2">
+          <Sparkles className="w-4 h-4" />
+          Importar Oferta com IA
+        </Link>
       </div>
 
       {/* ── Stats Grid ── */}
@@ -71,84 +81,87 @@ export default async function DashboardPage() {
           <div key={i} className="glass-card p-6 border border-white/5">
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/60">
-                <stat.icon className="w-5 h-5" />
+                <stat.icon className="w-5 h-5 text-emerald-400" />
               </div>
-              <div className={`flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full ${
-                stat.isPositive ? "bg-emerald-500/10 text-emerald-400" : "bg-white/10 text-white/40"
-              }`}>
-                {stat.isPositive ? <ArrowUpRight className="w-3 h-3" /> : null}
+              <div className="flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400">
+                <ArrowUpRight className="w-3 h-3" />
                 {stat.trend}
               </div>
             </div>
-            <p className="text-xs text-white/40 mb-1">{stat.label}</p>
-            <p className="text-2xl font-bold text-white tracking-tight">{stat.value}</p>
+            <p className="text-xs text-white/40 uppercase tracking-widest font-semibold">{stat.label}</p>
+            <p className="text-2xl font-bold text-white mt-1">{stat.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* ── Recent Sales ── */}
-        <div className="lg:col-span-2 glass-card border border-white/5 overflow-hidden">
-          <div className="p-6 border-b border-white/5 flex items-center justify-between">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white">Últimas Vendas</h3>
-            <Link href="/dashboard/sales" className="text-xs text-emerald-400 hover:underline">Ver todas</Link>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* ── Top Produtos Mais Clicados ── */}
+        <div className="glass-card p-6 border border-white/5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-bold uppercase tracking-widest text-emerald-400">
+              Ofertas Mais Clicadas
+            </h2>
+            <Link href="/dashboard/inventory" className="text-xs text-white/40 hover:text-white transition-colors">
+              Ver todas
+            </Link>
           </div>
+
           <div className="divide-y divide-white/5">
-            {recentOrders.length > 0 ? recentOrders.map((order) => (
-              <div key={order.id} className="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-all">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-white/5 overflow-hidden flex-shrink-0 relative">
-                     {/* Imagem do produto seria aqui */}
-                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+            {topProducts.length === 0 ? (
+              <p className="text-xs text-white/40 py-6 text-center">
+                Ainda não há registros de cliques. Divulgue seus links para começar a rastrear!
+              </p>
+            ) : (
+              topProducts.map((p, idx) => (
+                <div key={p.id} className="py-3 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-xs font-bold text-emerald-400 w-4">#{idx + 1}</span>
+                    <p className="text-xs text-white font-medium truncate max-w-xs">{p.title}</p>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-white line-clamp-1">{order.product.title}</p>
-                    <p className="text-xs text-white/40">{order.customerName} • {order.paymentMethod}</p>
-                  </div>
+                  <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full flex-shrink-0">
+                    {p.clicksCount} cliques
+                  </span>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-white">{new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(order.totalPrice))}</p>
-                  <p className={`text-[10px] font-bold uppercase tracking-tight ${
-                    order.status === "PAID" ? "text-emerald-400" : "text-amber-400"
-                  }`}>{order.status}</p>
-                </div>
-              </div>
-            )) : (
-              <div className="p-12 text-center">
-                <p className="text-sm text-white/20">Nenhuma venda registrada ainda.</p>
-              </div>
+              ))
             )}
           </div>
         </div>
 
-        {/* ── Quick Actions ── */}
-        <div className="space-y-6">
-          <div className="glass-card p-6 border border-white/5 bg-gradient-to-br from-emerald/10 to-transparent">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Ações Rápidas</h3>
-            <div className="space-y-3">
-              <Link href="/dashboard/inventory/new" className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-emerald/30 transition-all group">
-                <span className="text-sm text-white/80 group-hover:text-white transition-colors">Adicionar Peça</span>
-                <PlusCircle className="w-4 h-4 text-white/20 group-hover:text-emerald-400" />
-              </Link>
-              <Link href="/vitrine" target="_blank" className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-emerald/30 transition-all group">
-                <span className="text-sm text-white/80 group-hover:text-white transition-colors">Ver Loja Ao Vivo</span>
-                <ExternalLink className="w-4 h-4 text-white/20 group-hover:text-emerald-400" />
-              </Link>
-            </div>
-          </div>
+        {/* ── Cliques Recentes ── */}
+        <div className="glass-card p-6 border border-white/5 space-y-4">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-emerald-400">
+            Últimos Cliques Registrados
+          </h2>
 
-          <div className="glass-card p-6 border border-white/5">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-white mb-4">Dica de Performance</h3>
-            <p className="text-xs text-white/40 leading-relaxed">
-              Peças com mais de 5 fotos vendem em média 35% mais rápido. Experimente adicionar fotos de detalhes dos logos e etiquetas.
-            </p>
+          <div className="divide-y divide-white/5">
+            {recentClicks.length === 0 ? (
+              <p className="text-xs text-white/40 py-6 text-center">
+                Nenhum clique registrado recentemente.
+              </p>
+            ) : (
+              recentClicks.map((c) => (
+                <div key={c.id} className="py-3 flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-xs text-white font-medium truncate max-w-xs">{c.product.title}</p>
+                    <p className="text-[10px] text-white/40 mt-0.5">
+                      {new Date(c.clickedAt).toLocaleString("pt-BR")}
+                    </p>
+                  </div>
+                  <a
+                    href={`/r/${c.product.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all flex-shrink-0"
+                    title="Testar redirecionador"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-const PlusCircle = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-);

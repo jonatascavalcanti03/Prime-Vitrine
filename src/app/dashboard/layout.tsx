@@ -21,16 +21,15 @@ export default async function DashboardLayout({
   const session = await auth();
 
   // Proteção de Rota: Apenas Admin pode acessar
-  if (!session || (session.user.role !== "SUPER_ADMIN" && session.user.role !== "STORE_ADMIN")) {
+  const isAdmin = session?.user && (session.user.role === "ADMIN" || (session.user.role as string) === "SUPER_ADMIN");
+  if (!session || !isAdmin) {
     redirect("/auth/login?callbackUrl=/dashboard");
   }
 
   const sidebarLinks = [
     { label: "Visão Geral", icon: LayoutDashboard, href: "/dashboard" },
-    { label: "Inventário", icon: Package, href: "/dashboard/inventory" },
-    { label: "Vendas", icon: ShoppingBag, href: "/dashboard/sales" },
-    { label: "Clientes", icon: Users, href: "/dashboard/customers" },
-    { label: "Configurações", icon: Settings, href: "/dashboard/settings" },
+    { label: "Ofertas (Catálogo)", icon: Package, href: "/dashboard/inventory" },
+    { label: "Nova Oferta (com IA)", icon: PlusCircle, href: "/dashboard/inventory/new" },
   ];
 
   return (
@@ -42,7 +41,7 @@ export default async function DashboardLayout({
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald to-rose-gold flex items-center justify-center">
               <Package className="w-4 h-4 text-white" />
             </div>
-            <span className="font-serif font-bold text-xl text-white">Luxé <span className="text-xs text-white/40 block -mt-1 font-sans font-normal tracking-widest uppercase">Admin</span></span>
+            <span className="font-serif font-bold text-xl text-white">Prime <span className="text-emerald-400 font-sans">Vitrine</span> <span className="text-[10px] text-white/40 block -mt-1 font-sans font-normal tracking-widest uppercase">Admin</span></span>
           </Link>
         </div>
 

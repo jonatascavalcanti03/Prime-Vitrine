@@ -94,10 +94,10 @@ export function Navbar() {
               </motion.div>
               <div className="leading-none">
                 <span className="block font-serif font-bold text-lg text-white tracking-tight">
-                  Luxé
+                  Prime <span className="text-emerald-400">Vitrine</span>
                 </span>
-                <span className="block text-[10px] text-emerald tracking-[0.2em] uppercase font-medium">
-                  Brechó de Elite
+                <span className="block text-[9px] text-white/40 tracking-[0.2em] uppercase font-medium">
+                  Curadoria Mercado Livre
                 </span>
               </div>
             </Link>
@@ -167,16 +167,17 @@ export function Navbar() {
                 </Link>
               </motion.div>
 
-              {/* Cart */}
+              {/* Dashboard Shortcut */}
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
-                  href="/cart"
-                  id="navbar-cart"
-                  aria-label="Sacola de compras"
-                  className="relative flex items-center justify-center w-9 h-9 rounded-lg text-white/50 hover:text-white transition-colors"
+                  href="/dashboard"
+                  id="navbar-dashboard"
+                  aria-label="Painel Administrativo"
+                  title="Painel Administrativo"
+                  className="relative flex items-center justify-center w-9 h-9 rounded-lg text-white/50 hover:text-emerald-400 transition-colors"
                   style={{ background: "rgba(255,255,255,0.04)" }}
                 >
-                  <ShoppingBag className="w-4 h-4" />
+                  <LayoutDashboard className="w-4 h-4" />
                 </Link>
               </motion.div>
 
@@ -225,7 +226,7 @@ export function Navbar() {
                           </p>
                         </div>
                         <div className="p-1.5">
-                          {(session.user?.role === "SUPER_ADMIN" || session.user?.role === "STORE_ADMIN") && (
+                          {(session.user?.role === "ADMIN" || (session.user?.role as string) === "SUPER_ADMIN") && (
                             <Link
                               href="/dashboard"
                               id="nav-dashboard"

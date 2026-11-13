@@ -7,18 +7,18 @@ import { prisma } from "@/lib/prisma";
 const VALUE_PROPS = [
   {
     icon: Shield,
-    title: "Autenticidade Garantida",
-    desc: "Cada peça passa por curadoria rigorosa. Certificado incluso.",
+    title: "Compra Protegida",
+    desc: "Garantia oficial de entrega e segurança do Mercado Livre.",
   },
   {
     icon: TrendingUp,
-    title: "Peças de Alto Valor",
-    desc: "Descontos reais em relação ao preço de varejo das marcas.",
+    title: "Melhores Ofertas",
+    desc: "Curadoria com preços reduzidos e descontos monitorados.",
   },
   {
     icon: Truck,
-    title: "Entrega Premium",
-    desc: "Embalagem exclusiva com nota fiscal e rastreamento completo.",
+    title: "Envio Rápido",
+    desc: "Produtos com entrega rápida e frete oficial Mercado Livre.",
   },
 ];
 
@@ -31,14 +31,23 @@ export default async function HomePage() {
   });
 
   // 2. Mapear para o formato do ProductCard
-  const featuredProducts = featuredProductsRaw.map(p => {
+  const featuredProducts = featuredProductsRaw.map((p) => {
     const media = p.mediaUrls as any;
     const imageUrl = Array.isArray(media) && media.length > 0 ? media[0].url : "";
     return {
-      ...p,
-      imageUrl,
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      brand: p.brand || undefined,
+      categoryName: p.categoryName,
       price: Number(p.price),
-      originalPrice: p.originalPrice ? Number(p.originalPrice) : null,
+      originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
+      discountPercent: p.discountPercent || undefined,
+      imageUrl: imageUrl || "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&auto=format",
+      status: p.status,
+      views: p.views,
+      clicksCount: p.clicksCount,
+      featured: p.featured,
     };
   });
 
@@ -139,7 +148,7 @@ export default async function HomePage() {
                 style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
               />
               <button id="newsletter-submit" className="btn-primary whitespace-nowrap">
-                Entrar na VIP
+                Receber Ofertas
               </button>
             </div>
           </div>
@@ -149,7 +158,7 @@ export default async function HomePage() {
       <div className="divider-gradient" />
       <footer className="section-container py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-xs text-white/25">
-          © 2025 Luxé Brechó de Elite. Todos os direitos reservados.
+          © 2026 Prime Vitrine. Curadoria independente de ofertas do Mercado Livre.
         </p>
         <div className="flex items-center gap-6">
           <Link href="/sobre" className="text-xs text-white/25 hover:text-white/60 transition-colors">Sobre</Link>
