@@ -5,13 +5,18 @@ import { SlidersHorizontal, Search } from "lucide-react";
 export const revalidate = 60; // Revalida a página a cada 60s (ISR)
 
 export default async function VitrinePage() {
-  // Busca produtos no banco de dados (Apenas ofertas ativas)
-  const products = await prisma.product.findMany({
-    where: {
-      status: "AVAILABLE",
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  // Busca produtos no banco de dados de forma segura para o build
+  let products: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
+  try {
+    products = await prisma.product.findMany({
+      where: {
+        status: "AVAILABLE",
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (error) {
+    console.warn("Aviso no build/SSR (Vitrine): Banco ainda não inicializado ou inacessível:", error);
+  }
 
   return (
     <div className="min-h-screen pt-32 pb-20">

@@ -22,13 +22,20 @@ const VALUE_PROPS = [
   },
 ];
 
+export const revalidate = 60;
+
 export default async function HomePage() {
-  // 1. Buscar produtos em destaque reais do banco
-  const featuredProductsRaw = await prisma.product.findMany({
-    where: { featured: true },
-    take: 4,
-    orderBy: { createdAt: "desc" }
-  });
+  // 1. Buscar produtos em destaque reais do banco de forma segura para o build
+  let featuredProductsRaw: Awaited<ReturnType<typeof prisma.product.findMany>> = [];
+  try {
+    featuredProductsRaw = await prisma.product.findMany({
+      where: { featured: true },
+      take: 4,
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (error) {
+    console.warn("Aviso no build/SSR: Banco ainda não inicializado ou inacessível:", error);
+  }
 
   // 2. Mapear para o formato do ProductCard
   const featuredProducts = featuredProductsRaw.map((p) => {
