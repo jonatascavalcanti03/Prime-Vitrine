@@ -3,6 +3,7 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { Sparkles, ArrowRight, TrendingUp, Shield, Truck } from "lucide-react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { DEMO_FALLBACK_PRODUCTS } from "@/lib/data/demo-products";
 
 const VALUE_PROPS = [
   {
@@ -37,26 +38,38 @@ export default async function HomePage() {
     console.warn("Aviso no build/SSR: Banco ainda não inicializado ou inacessível:", error);
   }
 
-  // 2. Mapear para o formato do ProductCard
-  const featuredProducts = featuredProductsRaw.map((p) => {
-    const media = p.mediaUrls as any;
-    const imageUrl = Array.isArray(media) && media.length > 0 ? media[0].url : "";
-    return {
-      id: p.id,
-      slug: p.slug,
-      title: p.title,
-      brand: p.brand || undefined,
-      categoryName: p.categoryName,
-      price: Number(p.price),
-      originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
-      discountPercent: p.discountPercent || undefined,
-      imageUrl: imageUrl || "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&auto=format",
-      status: p.status,
-      views: p.views,
-      clicksCount: p.clicksCount,
-      featured: p.featured,
-    };
-  });
+  // 2. Mapear para o formato do ProductCard (com fallback para DEMO_FALLBACK_PRODUCTS se o banco estiver vazio na nuvem)
+  const featuredProducts =
+    featuredProductsRaw.length > 0
+      ? featuredProductsRaw.map((p) => {
+          const media = p.mediaUrls as unknown;
+          const imageUrl =
+            Array.isArray(media) &&
+            media.length > 0 &&
+            typeof media[0] === "object" &&
+            media[0] !== null &&
+            "url" in media[0]
+              ? String((media[0] as { url: unknown }).url)
+              : "";
+          return {
+            id: p.id,
+            slug: p.slug,
+            title: p.title,
+            brand: p.brand || undefined,
+            categoryName: p.categoryName,
+            price: Number(p.price),
+            originalPrice: p.originalPrice ? Number(p.originalPrice) : undefined,
+            discountPercent: p.discountPercent || undefined,
+            imageUrl:
+              imageUrl ||
+              "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=600&auto=format",
+            status: p.status,
+            views: p.views,
+            clicksCount: p.clicksCount,
+            featured: p.featured,
+          };
+        })
+      : DEMO_FALLBACK_PRODUCTS;
 
   return (
     <>
