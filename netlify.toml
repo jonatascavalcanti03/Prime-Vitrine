@@ -1,0 +1,21 @@
+# netlify.toml — Configuração Oficial para Next.js (App Router + SSR + Prisma)
+
+[build]
+  command = "npx prisma generate && npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Plugin Oficial Next.js Runtime v5 da Netlify (habilita App Router, SSR, Server Actions e Rotas Dinâmicas)
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Headers de Segurança
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
